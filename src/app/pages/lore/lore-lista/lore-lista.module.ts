@@ -4,17 +4,17 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { InicioPageRoutingModule } from './inicio-routing.module';
+import { LoreListaPageRoutingModule } from './lore-lista-routing.module';
 
-import { InicioPage } from './inicio.page';
+import { LoreListaPage } from './lore-lista.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    InicioPageRoutingModule
+    LoreListaPageRoutingModule
   ],
-  declarations: [InicioPage]
+  declarations: [LoreListaPage]
 })
-export class InicioPageModule {}
+export class LoreListaPageModule {}

@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { InicioPage } from './pages/inicio/inicio.page';
 const routes: Routes = [
   {
     path: '',
@@ -8,20 +7,16 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
-    path: 'inicio',
-    loadChildren: () => import('./pages/inicio/inicio.module').then( m => m.InicioPageModule)
+    path: 'lore-lista',
+    loadChildren: () => import('./pages/lore/lore-lista/lore-lista.module').then( m => m.LoreListaPageModule)
   },
   {
-    path: 'componentes',
-    loadChildren: () => import('./pages/componentes/componentes.module').then( m => m.ComponentesPageModule)
+    path: 'lore-detalle',
+    loadChildren: () => import('./pages/lore/lore-detalle/lore-detalle.module').then( m => m.LoreDetallePageModule)
   },
   {
-    path: 'nosotros',
-    loadChildren: () => import('./pages/nosotros/nosotros.module').then( m => m.NosotrosPageModule)
-  },
-  {
-    path: 'noticias',
-    loadChildren: () => import('./pages/noticias/noticias.module').then( m => m.NoticiasPageModule)
+    path: 'lore',
+    loadChildren: () => import('./pages/lore/lore.module').then( m => m.LorePageModule)
   },
 ];
 

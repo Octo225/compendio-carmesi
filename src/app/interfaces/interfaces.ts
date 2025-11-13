@@ -45,3 +45,17 @@ export interface personajesFirebase{
   salud:number;
   velocidad:number;
 }
+
+export interface personajesFirebase{
+  apellido:string;
+  nombre:string;
+}
+
+export interface EntradaLore {
+  id: string;
+  titulo: string;
+  subtitulo: string;
+  tipo: 'Personaje' | 'Enemigo' | 'Leyenda' | 'Lugar';
+  descripcion: string;
+  imagen: string;
+}

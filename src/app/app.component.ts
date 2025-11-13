@@ -17,23 +17,8 @@ export class AppComponent {
   elementos: Elemento[] = [
     {
       icono: 'home-outline',
-      nombre: 'Inicio',
-      ruta: '/inicio',
-    },
-    {
-      icono: 'newspaper-outline',
-      nombre: 'Noticias',
-      ruta: '/noticias',
-    },
-    {
-      icono: 'people-outline',
-      nombre: 'Nosotros',
-      ruta: '/nosotros',
-    },
-    {
-      icono: 'construct-outline',
-      nombre: 'Componentes',
-      ruta: '/componentes',
+      nombre: 'Lore',
+      ruta: '/lore',
     },
     
   ];

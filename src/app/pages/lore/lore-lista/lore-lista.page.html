@@ -1,0 +1,25 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/inicio"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Códice (Lore)</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  
+  <ion-card
+    (click)="verDetalle(entrada.id)"
+    *ngFor="let entrada of entradasLore">
+    
+    <img [src]="entrada.imagen" style="height: 30vh; width: 100%; object-fit: cover;" >
+    
+    <ion-card-header>
+      <ion-card-title>{{ entrada.titulo }}</ion-card-title>
+      <ion-card-subtitle>{{ entrada.subtitulo }}</ion-card-subtitle>
+    </ion-card-header>
+
+  </ion-card>
+  
+</ion-content>
