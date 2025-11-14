@@ -1,0 +1,56 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/forum-display"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Crear Publicación</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  
+  <form [formGroup]="postForm" (ngSubmit)="onSubmit()">
+
+    <ion-list>
+      
+      <ion-item>
+        <ion-label position="floating">Título</ion-label>
+        <ion-input 
+          type="text" 
+          formControlName="title"
+          placeholder="Escribe un título claro">
+        </ion-input>
+
+        <ion-note slot="error" *ngIf="f['title'].invalid && (f['title'].dirty || f['title'].touched)">
+          <span *ngIf="f['title'].errors?.['required']">El título es requerido.</span>
+          <span *ngIf="f['title'].errors?.['minlength']">Mínimo 5 caracteres.</span>
+        </ion-note>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Contenido</ion-label>
+        <ion-textarea 
+          formControlName="content" 
+          rows="8"
+          placeholder="Escribe el contenido de tu publicación...">
+        </ion-textarea>
+
+        <ion-note slot="error" *ngIf="f['content'].invalid && (f['content'].dirty || f['content'].touched)">
+          <span *ngIf="f['content'].errors?.['required']">El contenido es requerido.</span>
+          <span *ngIf="f['content'].errors?.['minlength']">Mínimo 10 caracteres.</span>
+        </ion-note>
+      </ion-item>
+
+    </ion-list>
+
+    <ion-button 
+      type="submit" 
+      [disabled]="postForm.invalid" 
+      expand="block"
+      class="ion-margin-top">
+      Publicar
+    </ion-button>
+
+  </form>
+
+</ion-content>

@@ -18,6 +18,11 @@ const routes: Routes = [
     path: 'lore',
     loadChildren: () => import('./pages/lore/lore.module').then( m => m.LorePageModule)
   },
+  {
+    path: 'foro',
+    loadChildren: () => import('./pages/foro/foro.module').then( m => m.ForoPageModule)
+  },
+
 ];
 
 @NgModule({

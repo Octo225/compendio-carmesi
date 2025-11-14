@@ -20,6 +20,11 @@ export class AppComponent {
       nombre: 'Lore',
       ruta: '/lore',
     },
+    {
+      icono: 'home-outline',
+      nombre: 'Foro',
+      ruta: '/foro',
+    },
     
   ];
 
