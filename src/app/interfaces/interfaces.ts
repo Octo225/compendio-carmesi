@@ -59,3 +59,12 @@ export interface EntradaLore {
   descripcion: string;
   imagen: string;
 }
+
+export interface Post {
+  id: string;
+  title: string;
+  content: string;
+  authorId: string;
+  authorName: string;
+  createdAt: any;
+}
