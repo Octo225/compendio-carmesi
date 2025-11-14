@@ -3,8 +3,16 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'inicio',
+    redirectTo: 'tabs',
     pathMatch: 'full'
+  },
+  {
+    path: 'tabs',
+    loadChildren: () => import('./pages/tabs/tabs.module').then(m => m.TabsPageModule)
+  },
+  {
+    path: 'lore-detalle/:id',
+    loadChildren: () => import('./pages/lore/lore-detalle/lore-detalle.module').then( m => m.LoreDetallePageModule)
   },
   {
     path: 'lore-lista',
@@ -22,6 +30,16 @@ const routes: Routes = [
     path: 'foro',
     loadChildren: () => import('./pages/foro/foro.module').then( m => m.ForoPageModule)
   },
+  {
+    path: 'inicio',
+    loadChildren: () => import('./pages/comunidad/inicio/inicio.module').then( m => m.InicioPageModule)
+  },
+  {
+    path: 'tabs',
+    loadChildren: () => import('./pages/tabs/tabs.module').then( m => m.TabsPageModule)
+  },
+
+
 
 ];
 

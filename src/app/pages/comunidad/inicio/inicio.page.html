@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button menu="first"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Comunidad</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+
+  <header class="hub-header">
+    <h1>Códice Carmesí</h1>
+    <p>Tu guía a través de los secretos</p>
+  </header>
+
+  <ion-searchbar 
+    placeholder="Buscar guías o temas..." 
+    class="custom-searchbar"
+    mode="ios">
+  </ion-searchbar>
+
+  <ion-list-header class="list-title">Últimas Guías</ion-list-header>
+  <ion-list [inset]="true" lines="none" class="hub-list">
+    <ion-item *ngFor="let guia of ultimasGuias" (click)="abrirGuia(guia)" detail="true" button>
+      <ion-thumbnail slot="start">
+        <img [src]="guia.imagen" alt="Icono de guía" />
+      </ion-thumbnail>
+      <ion-label>
+        <h2>{{ guia.titulo }}</h2>
+        <p>{{ guia.subtitulo }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ion-list-header class="list-title">Foro Popular</ion-list-header>
+  <ion-list [inset]="true" lines="none" class="hub-list">
+    <ion-item *ngFor="let post of foroPopular" (click)="abrirPost(post)" detail="true" button>
+      <ion-icon slot="start" name="chatbubbles-outline" color="danger"></ion-icon>
+      <ion-label>
+        <h2>{{ post.titulo }}</h2>
+        <p class="post-meta">{{ post.meta }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+</ion-content>
