@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-
+// Definición de interfaces para guías y posts del foro
 interface Guia {
   titulo: string;
   subtitulo: string;
@@ -22,7 +22,7 @@ export class InicioPage implements OnInit {
   foroPopular: PostForo[] = [];
 
   constructor() { }
-
+// Inicializar datos de ejemplo
   ngOnInit() {
     this.ultimasGuias = [
       {

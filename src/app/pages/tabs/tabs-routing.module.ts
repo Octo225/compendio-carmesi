@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { TabsPage } from './tabs.page';
 
 const routes: Routes = [
+  // Ruta principal de las pestañas
   {
     path: '', 
     component: TabsPage,
