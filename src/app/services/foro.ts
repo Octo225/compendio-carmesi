@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Firestore, collection, addDoc, serverTimestamp, collectionData, orderBy, query } from '@angular/fire/firestore';
-import { Auth } from '@angular/fire/auth'; 
+import { Auth } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
 import { Post } from '../interfaces/interfaces';
 
@@ -8,15 +8,15 @@ import { Post } from '../interfaces/interfaces';
   providedIn: 'root',
 })
 export class Foro {
-   constructor(
+  constructor(
     private firestore: Firestore,
-    private auth: Auth 
-  ) { }
+    private auth: Auth
+  ) {}
 
   // Función para crear un nuevo post
   async createPost(title: string, content: string) {
-    //FUNCION PARA AUTENTICAR USUARIO
-    const user = this.auth.currentUser;
+    // CAMBIO: Usamos el wrapper para obtener el usuario
+    const user = this.getCurrentUser();
 
     if (!user) {
       throw new Error('Usuario no autenticado');
@@ -26,23 +26,47 @@ export class Foro {
       title: title,
       content: content,
       authorId: user.uid,
-      authorName: user.displayName || 'Usuario Anónimo', 
-      createdAt: serverTimestamp()
+      authorName: user.displayName || 'Usuario Anónimo',
+      // CAMBIO: Usamos wrapper para el timestamp
+      createdAt: this.getTimestamp(),
     };
 
-    // Obtenemos la referencia a la colección 'posts'
-    const postsCollection = collection(this.firestore, 'posts');
-    
-    // Añadimos el nuevo documento
-    return await addDoc(postsCollection, postData);
+    // CAMBIO: Usamos wrappers
+    const postsCollection = this.getCollectionRef('posts');
+    return await this.ejecutarAddDoc(postsCollection, postData);
   }
 
   getPosts(): Observable<Post[]> {
-    const postsCollection = collection(this.firestore, 'posts');
-    
-    const q = query(postsCollection, orderBy('createdAt', 'desc'));
-
-    return collectionData(q, { idField: 'id' }) as Observable<Post[]>;
+    // CAMBIO: Usamos wrappers
+    const postsCollection = this.getCollectionRef('posts');
+    const q = this.crearQuery(postsCollection);
+    return this.obtenerCollectionData(q);
   }
-  
+
+  // --- MÉTODOS ENVOLTORIOS (Wrappers para Testing) ---
+  // Estos métodos existen solo para poder ser "espiados" en las pruebas
+
+  public getCurrentUser() {
+    return this.auth.currentUser;
+  }
+
+  public getCollectionRef(path: string) {
+    return collection(this.firestore, path);
+  }
+
+  public ejecutarAddDoc(collectionRef: any, data: any) {
+    return addDoc(collectionRef, data);
+  }
+
+  public getTimestamp() {
+    return serverTimestamp();
+  }
+
+  public crearQuery(collectionRef: any) {
+    return query(collectionRef, orderBy('createdAt', 'desc'));
+  }
+
+  public obtenerCollectionData(queryRef: any): Observable<Post[]> {
+    return collectionData(queryRef, { idField: 'id' }) as Observable<Post[]>;
+  }
 }
