@@ -1,0 +1,22 @@
+.detalle-imagen {
+  width: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Contenedor principal */
+.contenido-detalle {
+  text-align: justify;
+}
+
+/* Títulos */
+.titulo-detalle,
+.subtitulo-detalle {
+  text-align: justify;
+}
+
+/* Descripción */
+.descripcion-detalle {
+  text-align: justify;
+  white-space: pre-line; /* Respeta saltos de línea si tu descripción los tiene */
+}

@@ -21,6 +21,11 @@ const routes: Routes = [
         loadChildren: () => import('../foro/foro.module').then(m => m.ForoPageModule)
       },
       {
+        path: 'nosotros',
+        loadChildren: () => import('../nosotros/nosotros.module').then(m => m.NosotrosPageModule)
+      },
+      
+      {
         path: '',
         redirectTo: 'inicio',
         pathMatch: 'full'

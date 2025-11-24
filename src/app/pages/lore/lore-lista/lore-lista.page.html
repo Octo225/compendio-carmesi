@@ -5,18 +5,21 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  
+
   <ion-card
+    class="hub-list-card"
     (click)="verDetalle(entrada.id)"
     *ngFor="let entrada of entradasLore">
-    
-    <img [src]="entrada.imagen" style="height: 30vh; width: 100%; object-fit: cover;" >
-    
+
+    <div class="card-image-container">
+      <img [src]="entrada.imagen" alt="{{ entrada.titulo }}" />
+    </div>
+
     <ion-card-header>
       <ion-card-title>{{ entrada.titulo }}</ion-card-title>
       <ion-card-subtitle>{{ entrada.subtitulo }}</ion-card-subtitle>
     </ion-card-header>
 
   </ion-card>
-  
+
 </ion-content>
