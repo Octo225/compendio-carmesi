@@ -41,6 +41,10 @@ const routes: Routes = [
     path: 'nosotros',
     loadChildren: () => import('./pages/nosotros/nosotros.module').then( m => m.NosotrosPageModule)
   },
+  {
+    path: 'perfil',
+    loadChildren: () => import('./pages/perfil/perfil.module').then( m => m.PerfilPageModule)
+  },
 
 
 

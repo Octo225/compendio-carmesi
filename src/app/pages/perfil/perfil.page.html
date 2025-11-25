@@ -1,0 +1,51 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Perfil</ion-title>
+    
+    <ion-buttons slot="end" *ngIf="user$ | async">
+      <ion-button (click)="logout()">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div *ngIf="user$ | async as user; else authForms">
+    <div class="ion-text-center ion-padding top-section">
+      <ion-avatar class="profile-avatar">
+        <img src="assets/icon/favicon.png" /> </ion-avatar>
+      <h2>{{ user.email }}</h2>
+      <p>Miembro de la comunidad</p>
+    </div>
+    
+    </div>
+
+  <ng-template #authForms>
+    
+    <div class="auth-container">
+      
+      <div *ngIf="!mostrarRegistro">
+        <app-login-form></app-login-form>
+        
+        <div class="ion-text-center ion-margin-top">
+          <p>¿No tienes cuenta?</p>
+          <ion-button fill="clear" (click)="toggleForm()">Regístrate aquí</ion-button>
+        </div>
+      </div>
+
+      <div *ngIf="mostrarRegistro">
+        <app-registro-form></app-registro-form>
+        
+        <div class="ion-text-center ion-margin-top">
+          <p>¿Ya tienes cuenta?</p>
+          <ion-button fill="clear" (click)="toggleForm()">Inicia sesión aquí</ion-button>
+        </div>
+      </div>
+
+    </div>
+
+  </ng-template>
+
+</ion-content>
