@@ -1,5 +1,15 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, addDoc, serverTimestamp, collectionData, orderBy, query } from '@angular/fire/firestore';
+import {
+  Firestore,
+  collection,
+  addDoc,
+  serverTimestamp,
+  collectionData,
+  orderBy,
+  query,
+  doc,
+  docData,
+} from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
 import { Post } from '../interfaces/interfaces';
@@ -8,27 +18,21 @@ import { Post } from '../interfaces/interfaces';
   providedIn: 'root',
 })
 export class Foro {
-  constructor(
-    private firestore: Firestore,
-    private auth: Auth
-  ) {}
+  constructor(private firestore: Firestore, private auth: Auth) {}
 
   // Función para crear un nuevo post
-  async createPost(title: string, content: string) {
-    // CAMBIO: Usamos el wrapper para obtener el usuario
-    const user = this.getCurrentUser();
+  async createPost(title: string, content: string, category: string) {
+    const user = this.auth.currentUser;
 
-    if (!user) {
-      throw new Error('Usuario no autenticado');
-    }
+    if (!user) throw new Error('Usuario no autenticado');
 
     const postData = {
       title: title,
       content: content,
+      category: category, // <--- Guardamos la categoría
       authorId: user.uid,
-      authorName: user.displayName || 'Usuario Anónimo',
-      // CAMBIO: Usamos wrapper para el timestamp
-      createdAt: this.getTimestamp(),
+      authorName: user.displayName || 'Usuario',
+      createdAt: serverTimestamp(),
     };
 
     // CAMBIO: Usamos wrappers
@@ -68,5 +72,32 @@ export class Foro {
 
   public obtenerCollectionData(queryRef: any): Observable<Post[]> {
     return collectionData(queryRef, { idField: 'id' }) as Observable<Post[]>;
+  }
+
+  // 1. Obtener un post específico por su ID
+  getPostById(postId: string): Observable<any> {
+    const postDocRef = doc(this.firestore, `posts/${postId}`);
+    return docData(postDocRef, { idField: 'id' });
+  }
+
+  // 2. Obtener los comentarios de un post (Subcolección)
+  getComments(postId: string): Observable<any[]> {
+    const commentsRef = collection(this.firestore, `posts/${postId}/comments`);
+    const q = query(commentsRef, orderBy('createdAt', 'asc')); // Orden ascendente (antiguos primero)
+    return collectionData(q, { idField: 'id' });
+  }
+
+  // 3. Agregar un comentario a un post
+  async addComment(postId: string, content: string) {
+    const user = this.auth.currentUser;
+    if (!user) throw new Error('Debes estar logueado');
+
+    const commentsRef = collection(this.firestore, `posts/${postId}/comments`);
+    return addDoc(commentsRef, {
+      content,
+      authorId: user.uid,
+      authorName: user.displayName || 'Anónimo',
+      createdAt: serverTimestamp()
+    });
   }
 }

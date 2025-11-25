@@ -27,11 +27,11 @@ export class ForoPage implements OnInit {
 
   // Función para el botón de "Crear Post"
   goToCreatePost() {
-    this.navCtrl.navigateForward('/foro/create');
+    this.navCtrl.navigateForward('/foro/crear-post');
   }
 
   openPost(postId: string) {
-    console.log('Navegar al post con ID:', postId);
-    // this.navCtrl.navigateForward(`/foro/post/${postId}`);
+    // console.log('Navegar al post con ID:', postId);
+    this.navCtrl.navigateForward(['/tabs/foro/post', postId]);
   }
 }

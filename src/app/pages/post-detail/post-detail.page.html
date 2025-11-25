@@ -1,0 +1,60 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/foro"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Discusión</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div *ngIf="post$ | async as post" class="post-container">
+    <h1 class="post-title">{{ post.title }}</h1>
+    <ion-chip>
+      <ion-icon name="person-circle"></ion-icon>
+      <ion-label>{{ post.authorName }}</ion-label>
+    </ion-chip>
+    <div class="post-content">
+      {{ post.content }}
+    </div>
+    <div class="post-date">
+      {{ post.createdAt?.toDate() | date:'medium' }}
+    </div>
+  </div>
+
+  <hr class="divider">
+  <h3>Comentarios</h3>
+
+  <ion-list lines="none">
+    <div *ngFor="let comment of comments$ | async">
+
+      <ion-item class="comment-item">
+        <ion-avatar slot="start">
+          <ion-icon name="person-circle-outline" size="large"></ion-icon>
+        </ion-avatar>
+        <ion-label class="ion-text-wrap">
+          <h3>{{ comment.authorName }}</h3>
+          <p>{{ comment.content }}</p>
+          <p class="comment-date">{{ comment.createdAt?.toDate() | date:'short' }}</p>
+        </ion-label>
+      </ion-item>
+
+    </div>
+  </ion-list>
+
+  <div style="height: 60px;"></div> </ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-input
+        [(ngModel)]="newComment"
+        placeholder="Escribe un comentario...">
+      </ion-input>
+      <ion-button slot="end" (click)="sendComment()" [disabled]="!newComment">
+        <ion-icon name="send"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-toolbar>
+</ion-footer>

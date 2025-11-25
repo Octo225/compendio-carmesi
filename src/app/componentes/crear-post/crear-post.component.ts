@@ -1,4 +1,3 @@
-// src/app/componentes/crear-post/crear-post.component.ts
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { LoadingController, ToastController, NavController, IonicModule } from '@ionic/angular';
@@ -17,19 +16,21 @@ import { Foro } from 'src/app/services/foro';
   ]
 })
 export class CrearPostComponent implements OnInit {
-  
+
  postForm: FormGroup;
 
   constructor(
     private fb: FormBuilder,
-    private foro: Foro,
-    private loadingCtrl: LoadingController, // Para mostrar un spinner
-    private toastCtrl: ToastController,   // Para mostrar un mensaje de éxito/error
-    private navCtrl: NavController          // Para navegar hacia atrás
+    private foroService: Foro,
+    private loadingCtrl: LoadingController,
+    private toastCtrl: ToastController,
+    private navCtrl: NavController
   ) {
     this.postForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(5)]],
-      content: ['', [Validators.required, Validators.minLength(10)]]
+      content: ['', [Validators.required, Validators.minLength(10)]],
+      // Nuevo campo con valor por defecto 'foro'
+      category: ['foro', [Validators.required]]
     });
   }
 
@@ -40,33 +41,27 @@ export class CrearPostComponent implements OnInit {
     return this.postForm.controls;
   }
 
-  async onSubmit() {
-    if (this.postForm.invalid) {
-      return; // Detiene si el formulario es inválido
-    }
+ async onSubmit() {
+    if (this.postForm.invalid) return;
 
-    // 1. Muestra el "Loading"
-    const loading = await this.loadingCtrl.create({
-      message: 'Publicando...',
-    });
+    const loading = await this.loadingCtrl.create({ message: 'Publicando...' });
     await loading.present();
 
     try {
-      const { title, content } = this.postForm.value;
-      await this.foro.createPost(title, content);
-      
-      // 2. Oculta el loading y muestra el "Toast" de éxito
+      // Extraemos también la categoría
+      const { title, content, category } = this.postForm.value;
+
+      // La pasamos al servicio
+      await this.foroService.createPost(title, content, category);
+
       await loading.dismiss();
       this.presentToast('¡Publicación creada con éxito!');
-      
-      this.postForm.reset(); // Limpia el formulario
-      this.navCtrl.back();   // Regresa a la página anterior
-      
+      this.postForm.reset();
+      this.navCtrl.back();
+
     } catch (error) {
-      // 3. Oculta el loading y muestra el "Toast" de error
       await loading.dismiss();
       this.presentToast('Error al crear la publicación', 'danger');
-      console.error('Error al crear el post:', error);
     }
   }
 

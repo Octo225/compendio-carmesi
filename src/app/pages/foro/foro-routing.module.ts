@@ -9,6 +9,10 @@ const routes: Routes = [
   },
   {path:'crear-post',
     loadComponent: () => import('../../componentes/crear-post/crear-post.component').then( m => m.CrearPostComponent)
+  },
+  {
+    path: 'post/:id',
+    loadChildren: () => import('../../pages/post-detail/post-detail.module').then(m => m.PostDetailPageModule)
   }
 ];
 
