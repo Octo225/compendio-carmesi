@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar color="primary">
     <ion-title>Perfil</ion-title>
-    
+
     <ion-buttons slot="end" *ngIf="user$ | async">
       <ion-button (click)="logout()">
         <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
@@ -11,40 +11,73 @@
 </ion-header>
 
 <ion-content>
-
   <div *ngIf="user$ | async as user; else authForms">
     <div class="ion-text-center ion-padding top-section">
       <ion-icon name="person-circle-outline" size="large"></ion-icon>
       <h2>{{ user.email }}</h2>
       <p>Miembro de la comunidad</p>
+      <div class="ion-padding">
+        <ion-list class="glass-list">
+          <ion-list-header>
+            <ion-label class="text-light">Configuración</ion-label>
+          </ion-list-header>
+
+          <ion-item class="glass-item" lines="none">
+            <ion-icon
+              slot="start"
+              [name]="isDarkMode ? 'moon' : 'sunny'"
+              color="primary"
+            ></ion-icon>
+            <ion-label>
+              <h2>Modo {{ isDarkMode ? 'Muertos' : 'Vivos' }}</h2>
+              <p class="text-medium-light">Cambiar apariencia</p>
+            </ion-label>
+
+            <ion-toggle
+              slot="end"
+              [checked]="isDarkMode"
+              (ionChange)="toggleTheme($event)"
+              color="secondary"
+            >
+            </ion-toggle>
+          </ion-item>
+
+          <ion-item button (click)="logout()" class="glass-item" lines="none">
+            <ion-icon
+              slot="start"
+              name="log-out-outline"
+              color="danger"
+            ></ion-icon>
+            <ion-label color="danger">Cerrar Sesión</ion-label>
+          </ion-item>
+        </ion-list>
+      </div>
     </div>
-    
-    </div>
+  </div>
 
   <ng-template #authForms>
-    
     <div class="auth-container">
-      
       <div *ngIf="!mostrarRegistro">
         <app-login-form></app-login-form>
-        
+
         <div class="ion-text-center ion-margin-top">
           <p>¿No tienes cuenta?</p>
-          <ion-button fill="clear" (click)="toggleForm()">Regístrate aquí</ion-button>
+          <ion-button fill="clear" (click)="toggleForm()"
+            >Regístrate aquí</ion-button
+          >
         </div>
       </div>
 
       <div *ngIf="mostrarRegistro">
         <app-registro-form></app-registro-form>
-        
+
         <div class="ion-text-center ion-margin-top">
           <p>¿Ya tienes cuenta?</p>
-          <ion-button fill="clear" (click)="toggleForm()">Inicia sesión aquí</ion-button>
+          <ion-button fill="clear" (click)="toggleForm()"
+            >Inicia sesión aquí</ion-button
+          >
         </div>
       </div>
-
     </div>
-
   </ng-template>
-
 </ion-content>

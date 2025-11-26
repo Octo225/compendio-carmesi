@@ -34,4 +34,54 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import "@ionic/angular/css/palettes/dark.system.css";
+/* src/global.scss */
+
+ion-content {
+  --background: var(--custom-bg-image) no-repeat center center / cover fixed;
+}
+
+.content-container {
+  background: var(--bg-overlay) !important;
+  min-height: 100%;
+}
+
+/* --- CLASES DINÁMICAS --- */
+
+/* Esto cambia automáticamente de Blanco (Muertos) a Café (Vivos) */
+.text-light {
+  color: var(--dynamic-title) !important;
+}
+
+.text-medium-light {
+  color: var(--dynamic-subtitle) !important;
+}
+
+.glass-card,
+.glass-list,
+.glass-item,
+.glass-content {
+  /* Fondo cambia de Negro (Muertos) a Blanco (Vivos) */
+  background: var(--glass-background) !important;
+  --background: var(--glass-background) !important;
+
+  /* Texto cambia de Blanco (Muertos) a Café (Vivos) */
+  color: var(--glass-text) !important;
+
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.glass-item ion-label h2,
+.glass-item ion-label h3,
+ion-card-title {
+   color: var(--dynamic-title) !important;
+}
+
+.glass-item ion-label p,
+.glass-item ion-note,
+ion-card-subtitle,
+ion-card-content {
+   color: var(--dynamic-subtitle) !important;
+}
