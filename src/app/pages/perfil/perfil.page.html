@@ -14,8 +14,7 @@
 
   <div *ngIf="user$ | async as user; else authForms">
     <div class="ion-text-center ion-padding top-section">
-      <ion-avatar class="profile-avatar">
-        <img src="assets/icon/favicon.png" /> </ion-avatar>
+      <ion-icon name="person-circle-outline" size="large"></ion-icon>
       <h2>{{ user.email }}</h2>
       <p>Miembro de la comunidad</p>
     </div>

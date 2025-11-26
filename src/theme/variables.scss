@@ -1,2 +1,157 @@
-// For information on how to create your own theme, please see:
-// http://ionicframework.com/docs/theming/
+// Primary   = Color de Acción/Insignia (Óxido de Sangre / Rojo Carmesí)
+// Secondary = Color de Soporte o Acento (Cuero / Naranja)
+// Tertiary  = Elementos de Soporte (Hueso Seco / Púrpura Místico)
+ion-content {
+    // Propiedad de Ionic para el fondo del contenido
+    --background: url("/assets/fondoMuertos1.jpeg") no-repeat center center /
+      cover fixed;
+  }
+
+  /* 2. CLASES DE UTILIDAD PARA TEXTO (Globales) */
+  .text-light {
+    color: #ffffff !important;
+  }
+
+  .text-medium-light {
+    color: rgba(255, 255, 255, 0.7) !important;
+  }
+
+  /* 3. EFECTO CRISTAL (GLASSMORPHISM) GLOBAL
+   Úsalo en cualquier tarjeta o lista de la app */
+  .glass-card,
+  .glass-list,
+  .glass-item,
+  .glass-content {
+    // Fondo negro semitransparente
+    --background: rgba(20, 20, 20, 0.6) !important;
+    background: rgba(20, 20, 20, 0.6) !important;
+
+    // Desenfoque
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    // Bordes y Sombra
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  // Ajuste para tarjetas redondeadas
+  .glass-card {
+    border-radius: 16px;
+  }
+
+  // Ajuste para inputs dentro de items de cristal (Ej: Login/Registro)
+  .glass-input {
+    --color: white;
+    --placeholder-color: rgba(255, 255, 255, 0.5);
+    --background: transparent;
+  }
+
+:root {
+  /** PALETA VIVOS (TEMA CLARO) **/
+  
+  /* Primary: Óxido de Sangre (#A64B2A) */
+  --ion-color-primary: #A64B2A;
+  --ion-color-primary-rgb: 166, 75, 42;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #924224;
+  --ion-color-primary-tint: #b06043;
+
+  /* Secondary: Cuero Desgastado (#8C7B5B) */
+  --ion-color-secondary: #8C7B5B;
+  --ion-color-secondary-rgb: 140, 123, 91;
+  --ion-color-secondary-contrast: #000000;
+  --ion-color-secondary-contrast-rgb: 0, 0, 0;
+  --ion-color-secondary-shade: #7b6c50;
+  --ion-color-secondary-tint: #998a6e;
+
+  /* Tertiary: Hueso Seco (#C7B299) - Usado para tarjetas/inputs */
+  --ion-color-tertiary: #C7B299;
+  --ion-color-tertiary-rgb: 199, 178, 153;
+  --ion-color-tertiary-contrast: #000000;
+  --ion-color-tertiary-contrast-rgb: 0, 0, 0;
+  --ion-color-tertiary-shade: #af9d87;
+  --ion-color-tertiary-tint: #cdbaa3;
+
+  /* Backgrounds & Text: Pergamino Antiguo & Carbón de Leña */
+  --ion-background-color: #F2E8C9;
+  --ion-background-color-rgb: 242, 232, 201;
+  
+  --ion-text-color: #3E3228;
+  --ion-text-color-rgb: 62, 50, 40;
+
+  /* Ajustes adicionales para inputs y bordes en tema claro */
+  --ion-item-background: #F2E8C9;
+  --ion-card-background: #C7B299; // Usando color Hueso Seco para tarjetas
+}
+
+/* PALETA MUERTOS (TEMA OSCURO) */
+/* Se activa si el sistema está en modo oscuro O si añades la clase .dark al body */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ion-color-primary: #D91E2E; // Rojo Carmesí Vivo
+    --ion-color-primary-rgb: 217, 30, 46;
+    --ion-color-primary-contrast: #ffffff;
+    --ion-color-primary-contrast-rgb: 255, 255, 255;
+    --ion-color-primary-shade: #be1a28;
+    --ion-color-primary-tint: #dd3947;
+
+    --ion-color-secondary: #FF7F11; // Naranja Cempasúchil
+    --ion-color-secondary-rgb: 255, 127, 17;
+    --ion-color-secondary-contrast: #000000;
+    --ion-color-secondary-contrast-rgb: 0, 0, 0;
+    --ion-color-secondary-shade: #e06f0e;
+    --ion-color-secondary-tint: #ff8e2d;
+
+    --ion-color-tertiary: #4A2C4F; // Púrpura Místico
+    --ion-color-tertiary-rgb: 74, 44, 79;
+    --ion-color-tertiary-contrast: #ffffff;
+    --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+    --ion-color-tertiary-shade: #412746;
+    --ion-color-tertiary-tint: #5c4161;
+
+    /* Backgrounds & Text: Obsidiana Profunda & Crema Espectral */
+    --ion-background-color: #120A17;
+    --ion-background-color-rgb: 18, 10, 23;
+
+    --ion-text-color: #EAE0C8;
+    --ion-text-color-rgb: 234, 224, 200;
+
+    --ion-item-background: #120A17;
+    --ion-card-background: #1e1224; // Un tono ligeramente más claro que el fondo
+  }
+}
+
+/* Soporte manual para clase .dark */
+body.dark {
+    --ion-color-primary: #D91E2E;
+    --ion-color-primary-rgb: 217, 30, 46;
+    --ion-color-primary-contrast: #ffffff;
+    --ion-color-primary-contrast-rgb: 255, 255, 255;
+    --ion-color-primary-shade: #be1a28;
+    --ion-color-primary-tint: #dd3947;
+
+    --ion-color-secondary: #FF7F11;
+    --ion-color-secondary-rgb: 255, 127, 17;
+    --ion-color-secondary-contrast: #000000;
+    --ion-color-secondary-contrast-rgb: 0, 0, 0;
+    --ion-color-secondary-shade: #e06f0e;
+    --ion-color-secondary-tint: #ff8e2d;
+
+    --ion-color-tertiary: #4A2C4F;
+    --ion-color-tertiary-rgb: 74, 44, 79;
+    --ion-color-tertiary-contrast: #ffffff;
+    --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+    --ion-color-tertiary-shade: #412746;
+    --ion-color-tertiary-tint: #5c4161;
+
+    --ion-background-color: #120A17;
+    --ion-background-color-rgb: 18, 10, 23;
+
+    --ion-text-color: #EAE0C8;
+    --ion-text-color-rgb: 234, 224, 200;
+
+    --ion-item-background: #120A17;
+    --ion-card-background: #1e1224;
+  }

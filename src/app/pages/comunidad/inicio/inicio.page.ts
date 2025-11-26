@@ -1,15 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-// Definición de interfaces para guías y posts del foro
-interface Guia {
-  titulo: string;
-  subtitulo: string;
-  imagen: string;
-}
+import { NavController } from '@ionic/angular';
+import { Observable } from 'rxjs';
+import { Post } from 'src/app/interfaces/interfaces'; // Ajusta tu ruta de interfaz
+import { Foro } from 'src/app/services/foro';
 
-interface PostForo {
-  titulo: string;
-  meta: string;
-}
 @Component({
   standalone: false,
   selector: 'app-inicio',
@@ -18,41 +12,29 @@ interface PostForo {
 })
 export class InicioPage implements OnInit {
 
-  ultimasGuias: Guia[] = [];
-  foroPopular: PostForo[] = [];
+  public guiasRecientes$!: Observable<Post[]>;
+  public comunidadReciente$!: Observable<Post[]>;
 
-  constructor() { }
-// Inicializar datos de ejemplo
+  constructor(
+    private foroService: Foro,
+    private navCtrl: NavController
+  ) { }
+
   ngOnInit() {
-    this.ultimasGuias = [
-      {
-        titulo: 'Derrotar al Charro negro',
-        subtitulo: 'Estrategias y puntos débiles.',
-        imagen: 'https://placehold.co/80x80/c94a4a/ffffff?text=Jefe'
-      },
-      {
-        titulo: 'El Enigma del codice',
-        subtitulo: 'Solución al puzzle de la Biblioteca Prohibida.',
-        imagen: 'https://placehold.co/80x80/e57373/ffffff?text=Puzzle'
-      }
-    ];
+    // 1. Traer las 2 guías más recientes
+    this.guiasRecientes$ = this.foroService.getRecentPostsByCategory('guia', 2);
 
-    this.foroPopular = [
-      {
-        titulo: '¿Cuál es su Glifo Carmesí favorito?',
-        meta: '24 respuestas - por @Erudito22'
-      },
-      {
-        titulo: 'Teoría: El secreto de la primera página',
-        meta: '15 respuestas - por @LectorNocturno'
-      }
-    ];
+    // 2. Traer los 2 posts generales más recientes
+    this.comunidadReciente$ = this.foroService.getRecentPostsByCategory('foro', 2);
   }
 
-  abrirGuia(guia: Guia) {
+  // Función para abrir el detalle
+  openPost(postId: string) {
+    this.navCtrl.navigateForward(['/tabs/foro/post', postId]);
   }
-
-  abrirPost(post: PostForo) {
+  
+  // Función para ir al foro completo
+  goToForo() {
+    this.navCtrl.navigateForward('/tabs/foro');
   }
-
 }

@@ -1,47 +1,77 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-menu-button menu="first"></ion-menu-button>
-    </ion-buttons>
-    <ion-title>Comunidad</ion-title>
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary"> <div class="header-logo ion-padding-start">
+      <ion-title>Códice Carmesí</ion-title>
+    </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content class="ion-padding">
 
-  <header class="hub-header">
-    <h1>Códice Carmesí</h1>
-    <p>Tu guía a través de los secretos</p>
-  </header>
+  <div class="section-header">
+    <h2>📜 Guías Recientes</h2>
+    <ion-note>Aprende a sobrevivir</ion-note>
+  </div>
 
-  <ion-searchbar 
-    placeholder="Buscar guías o temas..." 
-    class="custom-searchbar"
-    mode="ios">
-  </ion-searchbar>
+  <div *ngIf="guiasRecientes$ | async as guias; else loading">
+    
+    <ion-grid class="ion-no-padding">
+      <ion-row>
+        <ion-col size="12" size-md="6" *ngFor="let guia of guias">
+          
+          <ion-card class="guide-card" (click)="openPost(guia.id!)">
+            <div class="card-band color-primary"></div> <ion-card-header>
+              <ion-badge color="secondary">Guía</ion-badge>
+              <ion-card-title>{{ guia.title }}</ion-card-title>
+              <ion-card-subtitle>Por: {{ guia.authorName }}</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
+              {{ guia.content | slice:0:80 }}...
+            </ion-card-content>
+          </ion-card>
 
-  <ion-list-header class="list-title">Últimas Guías</ion-list-header>
-  <ion-list [inset]="true" lines="none" class="hub-list">
-    <ion-item *ngFor="let guia of ultimasGuias" (click)="abrirGuia(guia)" detail="true" button>
-      <ion-thumbnail slot="start">
-        <img [src]="guia.imagen" alt="Icono de guía" />
-      </ion-thumbnail>
-      <ion-label>
-        <h2>{{ guia.titulo }}</h2>
-        <p>{{ guia.subtitulo }}</p>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+        </ion-col>
+      </ion-row>
+      
+      <div *ngIf="guias.length === 0" class="empty-state">
+        <p>Aún no hay guías escritas.</p>
+      </div>
+    </ion-grid>
+  </div>
 
-  <ion-list-header class="list-title">Foro Popular</ion-list-header>
-  <ion-list [inset]="true" lines="none" class="hub-list">
-    <ion-item *ngFor="let post of foroPopular" (click)="abrirPost(post)" detail="true" button>
-      <ion-icon slot="start" name="chatbubbles-outline" color="danger"></ion-icon>
-      <ion-label>
-        <h2>{{ post.titulo }}</h2>
-        <p class="post-meta">{{ post.meta }}</p>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+
+  <div class="section-header ion-margin-top">
+    <h2>🗣️ Ecos de la Comunidad</h2>
+    <ion-button fill="clear" size="small" (click)="goToForo()">Ver todo</ion-button>
+  </div>
+
+  <div *ngIf="comunidadReciente$ | async as posts; else loading">
+    
+    <ion-list class="community-list">
+      <ion-item *ngFor="let post of posts" detail="true" (click)="openPost(post.id!)" lines="full">
+        <ion-icon name="chatbubble-ellipses-outline" slot="start" color="tertiary"></ion-icon>
+        <ion-label>
+          <h3>{{ post.title }}</h3>
+          <p>{{ post.content | slice:0:50 }}...</p>
+          <ion-note class="date-note">{{ post.createdAt?.toDate() | date:'shortDate' }}</ion-note>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <div *ngIf="posts.length === 0" class="empty-state">
+      <p>Todo está tranquilo en el limbo...</p>
+    </div>
+
+  </div>
+
+  <ng-template #loading>
+    <ion-card>
+      <ion-card-header>
+        <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+      </ion-card-content>
+    </ion-card>
+  </ng-template>
 
 </ion-content>

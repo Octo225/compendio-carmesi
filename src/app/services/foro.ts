@@ -9,6 +9,8 @@ import {
   query,
   doc,
   docData,
+  limit,
+  where,
 } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
@@ -99,5 +101,18 @@ export class Foro {
       authorName: user.displayName || 'Anónimo',
       createdAt: serverTimestamp()
     });
+  }
+
+  getRecentPostsByCategory(category: string, amount: number): Observable<Post[]> {
+    const postsCollection = collection(this.firestore, 'posts');
+    
+    const q = query(
+      postsCollection, 
+      where('category', '==', category), // Filtra por 'guia' o 'foro'
+      orderBy('createdAt', 'desc'),      // Los más recientes primero
+      limit(amount)                      // Solo trae la cantidad que pidas (2)
+    );
+
+    return collectionData(q, { idField: 'id' }) as Observable<Post[]>;
   }
 }
