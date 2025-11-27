@@ -1,67 +1,77 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ForoPage } from './foro.page';
 import { Foro } from 'src/app/services/foro';
 import { NavController } from '@ionic/angular';
 import { of } from 'rxjs';
+import { Post } from 'src/app/interfaces/interfaces';
+
+// 1. Mock de Datos
+const MOCK_POSTS: Post[] = [
+  { 
+    id: '1', 
+    title: 'Post Test', 
+    content: 'Contenido', 
+    category: 'foro', 
+    authorId: '123', 
+    authorName: 'User', 
+    createdAt: { toDate: () => new Date() } 
+  } as any
+];
+
+// 2. Mock del Servicio
+const foroServiceMock = {
+  getPosts: () => of(MOCK_POSTS)
+};
 
 describe('ForoPage', () => {
   let component: ForoPage;
   let fixture: ComponentFixture<ForoPage>;
-  
-  // Definimos las variables para los espías
   let navCtrlSpy: jasmine.SpyObj<NavController>;
-  let foroSpy: jasmine.SpyObj<Foro>;
 
-  beforeEach(async () => {
-    // 1. Creamos los Mocks (Objetos falsos)
-    // Necesitamos espiar 'navigateForward' del NavController
-    const spyNav = jasmine.createSpyObj('NavController', ['navigateForward']);
-    // Necesitamos espiar 'getPosts' del servicio Foro
-    const spyForo = jasmine.createSpyObj('Foro', ['getPosts']);
+  beforeEach(waitForAsync(() => {
+    // Creamos el espía para NavController
+    navCtrlSpy = jasmine.createSpyObj('NavController', ['navigateForward']);
 
-    // Configuramos que getPosts devuelva un array vacío para que ngOnInit no falle
-    spyForo.getPosts.and.returnValue(of([]));
-
-    await TestBed.configureTestingModule({
+    TestBed.configureTestingModule({
       declarations: [ ForoPage ],
       providers: [
-        // Inyectamos nuestros dobles de acción
-        { provide: NavController, useValue: spyNav },
-        { provide: Foro, useValue: spyForo }
+        { provide: Foro, useValue: foroServiceMock },
+        { provide: NavController, useValue: navCtrlSpy }
       ]
     }).compileComponents();
-
-    // Recuperamos los espías para poder interrogarlos en los tests
-    navCtrlSpy = TestBed.inject(NavController) as jasmine.SpyObj<NavController>;
-    foroSpy = TestBed.inject(Foro) as jasmine.SpyObj<Foro>;
 
     fixture = TestBed.createComponent(ForoPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  });
+  }));
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  // --- SOLUCIÓN PARA LÍNEAS 29-31 (goToCreatePost) ---
-  it('debería navegar a /foro/create al llamar a goToCreatePost', () => {
-    // 1. Ejecutamos la función
-    component.goToCreatePost();
-
-    // 2. Verificamos que el NavController haya sido llamado con la ruta correcta
-    expect(navCtrlSpy.navigateForward).toHaveBeenCalledWith('/foro/create');
+  it('debe cargar los posts al iniciar', (done) => {
+    component.posts$.subscribe(posts => {
+      expect(posts.length).toBe(1);
+      expect(posts[0].title).toBe('Post Test');
+      done();
+    });
   });
 
-  // --- SOLUCIÓN PARA LÍNEAS 33-36 (openPost) ---
-  it('debería hacer un console.log al llamar a openPost', () => {
-    // Espiamos el console.log para verificar que se ejecute
-    spyOn(console, 'log');
+  it('debe navegar a /foro/crear-post al llamar a goToCreatePost', () => {
+    component.goToCreatePost();
+    
+    // --- CORRECCIÓN AQUÍ ---
+    // Actualizamos la ruta esperada para que coincida con tu código real
+    expect(navCtrlSpy.navigateForward).toHaveBeenCalledWith('/foro/crear-post');
+    // Nota: Si usas tabs, tal vez tu código real sea '/tabs/foro/crear-post'. 
+    // Ajusta esta línea según lo que tengas en tu foro.page.ts
+  });
 
-    // 1. Ejecutamos la función con un ID de prueba
-    component.openPost('id-prueba-123');
-
-    // 2. Verificamos que se imprimió el mensaje esperado
-    expect(console.log).toHaveBeenCalledWith('Navegar al post con ID:', 'id-prueba-123');
+  it('debe navegar al detalle del post al llamar a openPost', () => {
+    const postId = '123';
+    component.openPost(postId);
+    
+    // Verificamos que navegue al detalle
+    expect(navCtrlSpy.navigateForward).toHaveBeenCalledWith(['/tabs/foro/post', postId]);
   });
 });

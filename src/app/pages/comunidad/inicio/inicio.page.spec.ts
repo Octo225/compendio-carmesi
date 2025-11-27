@@ -1,53 +1,95 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { InicioPage } from './inicio.page';
+import { Foro } from 'src/app/services/foro';
+import { NavController } from '@ionic/angular';
+import { of } from 'rxjs';
+import { Post } from 'src/app/interfaces/interfaces';
+import { Auth } from '@angular/fire/auth';
+
+// 1. MOCK DE DATOS CORREGIDO
+// Usamos 'as any' para evitar conflictos estrictos de tipos en la prueba
+const MOCK_POSTS: Post[] = [
+  { 
+    id: '1', 
+    title: 'Test 1', 
+    content: 'Contenido 1', 
+    category: 'guia', 
+    authorId: '1', 
+    authorName: 'User', 
+    createdAt: { toDate: () => new Date() } 
+  } as any, // <--- ESTO SOLUCIONA EL ERROR ROJO
+  { 
+    id: '2', 
+    title: 'Test 2', 
+    content: 'Contenido 2', 
+    category: 'foro', 
+    authorId: '2', 
+    authorName: 'User', 
+    createdAt: { toDate: () => new Date() } 
+  } as any  // <--- AQUÍ TAMBIÉN
+];
+
+// 2. Mock del Servicio
+const foroServiceMock = {
+  getRecentPostsByCategory: (category: string, limit: number) => of(MOCK_POSTS)
+};
 
 describe('InicioPage', () => {
   let component: InicioPage;
   let fixture: ComponentFixture<InicioPage>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ InicioPage ]
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [ InicioPage ],
+      providers: [
+        { provide: Foro, useValue: foroServiceMock },
+        { provide: Auth, useValue: {} }, // Mock simple de Auth para evitar errores de inyección
+        { provide: NavController, useValue: { navigateForward: jasmine.createSpy('navigateForward') } }
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(InicioPage);
     component = fixture.componentInstance;
-    
-    // Al hacer detectChanges, se ejecuta ngOnInit automáticamente
-    // llenando los arrays ultimasGuias y foroPopular
     fixture.detectChanges();
-  });
+  }));
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  // TEST PARA CUBRIR LÍNEAS 27-49 (Datos de ngOnInit)
-  it('debería cargar los datos estáticos al iniciar', () => {
-    expect(component.ultimasGuias.length).toBeGreaterThan(0);
-    expect(component.foroPopular.length).toBeGreaterThan(0);
+  it('debe cargar las guías recientes', (done) => {
+    component.guiasRecientes$.subscribe(guias => {
+      expect(guias.length).toBeGreaterThan(0);
+      expect(guias[0].title).toBe('Test 1');
+      done();
+    });
   });
 
-  // TEST PARA CUBRIR LÍNEA 52 (abrirGuia)
-  it('debería ejecutar abrirGuia sin errores', () => {
-    // Tomamos una guía real del array para pasarla como argumento
-    const guiaPrueba = component.ultimasGuias[0];
-    
-    // Llamamos a la función
-    component.abrirGuia(guiaPrueba);
-    
-    // Como la función está vacía, solo verificamos que "llegamos vivos" aquí
-    expect(true).toBeTrue();
+  it('debe cargar el foro popular', (done) => {
+    component.comunidadReciente$.subscribe(posts => {
+      expect(posts.length).toBeGreaterThan(0);
+      done();
+    });
   });
 
-  // TEST PARA CUBRIR LÍNEA 55 (abrirPost)
-  it('debería ejecutar abrirPost sin errores', () => {
-    // Tomamos un post real del array
-    const postPrueba = component.foroPopular[0];
+  it('debe navegar al detalle del post al hacer click', (done) => {
+    const navCtrl = TestBed.inject(NavController);
     
-    // Llamamos a la función
-    component.abrirPost(postPrueba);
-    
-    expect(true).toBeTrue();
+    component.guiasRecientes$.subscribe(guias => {
+      const guiaPrueba = guias[0];
+      
+      component.openPost(guiaPrueba.id!);
+      
+      // 'as any' también aquí para evitar quejas sobre la sobrecarga de funciones
+      expect(navCtrl.navigateForward).toHaveBeenCalledWith(['/tabs/foro/post', '1'] as any);
+      
+      done();
+    });
+  });
+
+  it('debe navegar al foro completo', () => {
+    const navCtrl = TestBed.inject(NavController);
+    component.goToForo();
+    expect(navCtrl.navigateForward).toHaveBeenCalledWith('/tabs/foro');
   });
 });
