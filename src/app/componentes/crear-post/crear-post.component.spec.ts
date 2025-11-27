@@ -4,46 +4,46 @@ import { IonicModule, NavController, LoadingController, ToastController } from '
 import { ReactiveFormsModule } from '@angular/forms';
 import { Foro } from 'src/app/services/foro';
 
-// 1. Mock del Servicio
-const firestoreServiceMock = {
-  // createPost devuelve una Promesa resuelta
-  createPost: jasmine.createSpy('createPost').and.returnValue(Promise.resolve())
-};
-
-// 2. Mocks de Ionic
-const navCtrlMock = {
-  back: jasmine.createSpy('back')
-};
-
-const loadingCtrlMock = {
-  create: () => Promise.resolve({
-    present: () => Promise.resolve(),
-    dismiss: () => Promise.resolve()
-  })
-};
-
-const toastCtrlMock = {
-  create: () => Promise.resolve({
-    present: () => Promise.resolve()
-  })
-};
-
 describe('CrearPostComponent', () => {
   let component: CrearPostComponent;
   let fixture: ComponentFixture<CrearPostComponent>;
 
+  // Spies for Services and Controllers
+  let foroServiceSpy: jasmine.SpyObj<Foro>;
+  let navCtrlSpy: jasmine.SpyObj<NavController>;
+  let loadingCtrlSpy: jasmine.SpyObj<LoadingController>;
+  let toastCtrlSpy: jasmine.SpyObj<ToastController>;
+
+  // Spies for HTML Elements returned by Ionic
+  let loadingElementSpy: jasmine.SpyObj<HTMLIonLoadingElement>;
+  let toastElementSpy: jasmine.SpyObj<HTMLIonToastElement>;
+
   beforeEach(waitForAsync(() => {
+    // 1. Create robust Spies
+    foroServiceSpy = jasmine.createSpyObj('Foro', ['createPost']);
+    navCtrlSpy = jasmine.createSpyObj('NavController', ['back']);
+
+    // Mock Loading Controller + Element
+    loadingElementSpy = jasmine.createSpyObj('HTMLIonLoadingElement', ['present', 'dismiss']);
+    loadingCtrlSpy = jasmine.createSpyObj('LoadingController', ['create']);
+    loadingCtrlSpy.create.and.returnValue(Promise.resolve(loadingElementSpy));
+
+    // Mock Toast Controller + Element
+    toastElementSpy = jasmine.createSpyObj('HTMLIonToastElement', ['present']);
+    toastCtrlSpy = jasmine.createSpyObj('ToastController', ['create']);
+    toastCtrlSpy.create.and.returnValue(Promise.resolve(toastElementSpy));
+
     TestBed.configureTestingModule({
-      imports: [ 
-        IonicModule.forRoot(), 
-        ReactiveFormsModule, 
-        CrearPostComponent // Importamos el componente (es standalone)
+      imports: [
+        IonicModule.forRoot(),
+        ReactiveFormsModule,
+        CrearPostComponent
       ],
       providers: [
-        { provide: Foro, useValue: firestoreServiceMock },
-        { provide: NavController, useValue: navCtrlMock },
-        { provide: LoadingController, useValue: loadingCtrlMock },
-        { provide: ToastController, useValue: toastCtrlMock }
+        { provide: Foro, useValue: foroServiceSpy },
+        { provide: NavController, useValue: navCtrlSpy },
+        { provide: LoadingController, useValue: loadingCtrlSpy },
+        { provide: ToastController, useValue: toastCtrlSpy }
       ]
     }).compileComponents();
 
@@ -56,37 +56,84 @@ describe('CrearPostComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('debe llamar a createPost y navegar atrás si el formulario es válido', async () => {
-    // 1. Llenamos el formulario con datos válidos
-    component.postForm.controls['title'].setValue('Título de Prueba');
-    component.postForm.controls['content'].setValue('Contenido de prueba con más de 10 caracteres');
-    
-    // --- CLAVE DEL ARREGLO: Asignar también la categoría ---
-    component.postForm.controls['category'].setValue('guia'); 
-
-    // 2. Ejecutamos el envío
-    await component.onSubmit();
-
-    // 3. Verificamos que el servicio se llamó con LOS 3 ARGUMENTOS
-    expect(firestoreServiceMock.createPost).toHaveBeenCalledWith(
-      'Título de Prueba',
-      'Contenido de prueba con más de 10 caracteres',
-      'guia' // <--- Si faltaba esto, el test fallaba
-    );
-
-    // 4. Verificamos que navegó hacia atrás
-    expect(navCtrlMock.back).toHaveBeenCalled();
+  // --- Test 1: Coverage for Getter 'f' ---
+  it('should return form controls via getter f', () => {
+    expect(component.f).toBeDefined();
+    expect(component.f['title']).toBeDefined();
   });
 
-  it('NO debe llamar a createPost si el formulario es inválido', async () => {
-    // Reseteamos el espía para asegurar conteo limpio
-    firestoreServiceMock.createPost.calls.reset();
+  // --- Test 2: Validation Logic ---
+  it('should NOT call createPost if form is invalid', async () => {
+    component.postForm.controls['title'].setValue(''); // Invalid
 
-    // Formulario vacío (inválido)
-    component.postForm.controls['title'].setValue(''); 
-    
     await component.onSubmit();
 
-    expect(firestoreServiceMock.createPost).not.toHaveBeenCalled();
+    expect(loadingCtrlSpy.create).not.toHaveBeenCalled();
+    expect(foroServiceSpy.createPost).not.toHaveBeenCalled();
+  });
+
+  // --- Test 3: Success Scenario ---
+  it('should call service, show success toast, and navigate back on success', async () => {
+    // 1. Fill Form
+    component.postForm.setValue({
+      title: 'Valid Title',
+      content: 'Valid Content Long Enough',
+      category: 'guia'
+    });
+
+    // 2. Mock Success
+    foroServiceSpy.createPost.and.returnValue(Promise.resolve({} as any));
+
+    // 3. Execute
+    await component.onSubmit();
+
+    // 4. Assertions
+    expect(loadingCtrlSpy.create).toHaveBeenCalled();
+    expect(loadingElementSpy.present).toHaveBeenCalled();
+
+    expect(foroServiceSpy.createPost).toHaveBeenCalledWith('Valid Title', 'Valid Content Long Enough', 'guia');
+
+    expect(loadingElementSpy.dismiss).toHaveBeenCalled(); // Dismiss loading
+    expect(navCtrlSpy.back).toHaveBeenCalled(); // Go back
+
+    // Check Success Toast
+    expect(toastCtrlSpy.create).toHaveBeenCalledWith(jasmine.objectContaining({
+      message: '¡Publicación creada con éxito!',
+      color: 'success'
+    }));
+    expect(toastElementSpy.present).toHaveBeenCalled();
+  });
+
+  // --- Test 4: Error Scenario (Catches the red lines in catch block) ---
+  it('should handle error, dismiss loading, and show error toast', async () => {
+    // 1. Fill Form
+    component.postForm.setValue({
+      title: 'Valid Title',
+      content: 'Valid Content Long Enough',
+      category: 'foro'
+    });
+
+    // 2. Mock Failure (Promise.reject)
+    foroServiceSpy.createPost.and.returnValue(Promise.reject('Network Error'));
+
+    // 3. Execute
+    await component.onSubmit();
+
+    // 4. Assertions
+    expect(loadingCtrlSpy.create).toHaveBeenCalled();
+    expect(foroServiceSpy.createPost).toHaveBeenCalled();
+
+    // IMPORTANT: Verify loading was dismissed in the catch block
+    expect(loadingElementSpy.dismiss).toHaveBeenCalled();
+
+    // Check Error Toast
+    expect(toastCtrlSpy.create).toHaveBeenCalledWith(jasmine.objectContaining({
+      message: 'Error al crear la publicación',
+      color: 'danger'
+    }));
+    expect(toastElementSpy.present).toHaveBeenCalled();
+
+    // Ensure we DID NOT navigate back on error
+    expect(navCtrlSpy.back).not.toHaveBeenCalled();
   });
 });

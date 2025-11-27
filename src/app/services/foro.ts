@@ -16,6 +16,22 @@ import { Auth } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
 import { Post } from '../interfaces/interfaces';
 
+// --- WRAPPER PARA TESTING ---
+// Agrupamos las funciones de la librería en un objeto local.
+// Esto permite que spyOn funcione sin errores de "read-only".
+export const FirestoreProxy = {
+  collection: collection,
+  addDoc: addDoc,
+  serverTimestamp: serverTimestamp,
+  collectionData: collectionData,
+  query: query,
+  orderBy: orderBy,
+  doc: doc,
+  docData: docData,
+  limit: limit,
+  where: where
+};
+
 @Injectable({
   providedIn: 'root',
 })
@@ -31,62 +47,35 @@ export class Foro {
     const postData = {
       title: title,
       content: content,
-      category: category, // <--- Guardamos la categoría
+      category: category,
       authorId: user.uid,
       authorName: user.displayName || 'Usuario',
-      createdAt: serverTimestamp(),
+      createdAt: FirestoreProxy.serverTimestamp(),
     };
 
-    // CAMBIO: Usamos wrappers
-    const postsCollection = this.getCollectionRef('posts');
-    return await this.ejecutarAddDoc(postsCollection, postData);
+    // Usamos el Proxy en lugar de la función directa
+    const postsCollection = FirestoreProxy.collection(this.firestore, 'posts');
+    return await FirestoreProxy.addDoc(postsCollection, postData);
   }
 
   getPosts(): Observable<Post[]> {
-    // CAMBIO: Usamos wrappers
-    const postsCollection = this.getCollectionRef('posts');
-    const q = this.crearQuery(postsCollection);
-    return this.obtenerCollectionData(q);
-  }
-
-  // --- MÉTODOS ENVOLTORIOS (Wrappers para Testing) ---
-  // Estos métodos existen solo para poder ser "espiados" en las pruebas
-
-  public getCurrentUser() {
-    return this.auth.currentUser;
-  }
-
-  public getCollectionRef(path: string) {
-    return collection(this.firestore, path);
-  }
-
-  public ejecutarAddDoc(collectionRef: any, data: any) {
-    return addDoc(collectionRef, data);
-  }
-
-  public getTimestamp() {
-    return serverTimestamp();
-  }
-
-  public crearQuery(collectionRef: any) {
-    return query(collectionRef, orderBy('createdAt', 'desc'));
-  }
-
-  public obtenerCollectionData(queryRef: any): Observable<Post[]> {
-    return collectionData(queryRef, { idField: 'id' }) as Observable<Post[]>;
+    const postsCollection = FirestoreProxy.collection(this.firestore, 'posts');
+    // Creamos query ordenando por fecha descendente
+    const q = FirestoreProxy.query(postsCollection, FirestoreProxy.orderBy('createdAt', 'desc'));
+    return FirestoreProxy.collectionData(q, { idField: 'id' }) as Observable<Post[]>;
   }
 
   // 1. Obtener un post específico por su ID
   getPostById(postId: string): Observable<any> {
-    const postDocRef = doc(this.firestore, `posts/${postId}`);
-    return docData(postDocRef, { idField: 'id' });
+    const postDocRef = FirestoreProxy.doc(this.firestore, `posts/${postId}`);
+    return FirestoreProxy.docData(postDocRef, { idField: 'id' });
   }
 
-  // 2. Obtener los comentarios de un post (Subcolección)
+  // 2. Obtener los comentarios de un post
   getComments(postId: string): Observable<any[]> {
-    const commentsRef = collection(this.firestore, `posts/${postId}/comments`);
-    const q = query(commentsRef, orderBy('createdAt', 'asc')); // Orden ascendente (antiguos primero)
-    return collectionData(q, { idField: 'id' });
+    const commentsRef = FirestoreProxy.collection(this.firestore, `posts/${postId}/comments`);
+    const q = FirestoreProxy.query(commentsRef, FirestoreProxy.orderBy('createdAt', 'asc'));
+    return FirestoreProxy.collectionData(q, { idField: 'id' });
   }
 
   // 3. Agregar un comentario a un post
@@ -94,25 +83,30 @@ export class Foro {
     const user = this.auth.currentUser;
     if (!user) throw new Error('Debes estar logueado');
 
-    const commentsRef = collection(this.firestore, `posts/${postId}/comments`);
-    return addDoc(commentsRef, {
+    const commentsRef = FirestoreProxy.collection(this.firestore, `posts/${postId}/comments`);
+    return FirestoreProxy.addDoc(commentsRef, {
       content,
       authorId: user.uid,
       authorName: user.displayName || 'Anónimo',
-      createdAt: serverTimestamp()
+      createdAt: FirestoreProxy.serverTimestamp()
     });
   }
 
   getRecentPostsByCategory(category: string, amount: number): Observable<Post[]> {
-    const postsCollection = collection(this.firestore, 'posts');
-    
-    const q = query(
-      postsCollection, 
-      where('category', '==', category), // Filtra por 'guia' o 'foro'
-      orderBy('createdAt', 'desc'),      // Los más recientes primero
-      limit(amount)                      // Solo trae la cantidad que pidas (2)
+    const postsCollection = FirestoreProxy.collection(this.firestore, 'posts');
+
+    const q = FirestoreProxy.query(
+      postsCollection,
+      FirestoreProxy.where('category', '==', category),
+      FirestoreProxy.orderBy('createdAt', 'desc'),
+      FirestoreProxy.limit(amount)
     );
 
-    return collectionData(q, { idField: 'id' }) as Observable<Post[]>;
+    return FirestoreProxy.collectionData(q, { idField: 'id' }) as Observable<Post[]>;
+  }
+
+  // Métodos auxiliares (ya no estrictamente necesarios para test, pero útiles si los usas fuera)
+  public getCurrentUser() {
+    return this.auth.currentUser;
   }
 }

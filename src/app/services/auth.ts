@@ -1,15 +1,28 @@
 import { Injectable } from '@angular/core';
-import { 
-  Auth, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  signOut, 
-  authState, 
+import {
+  Auth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  authState,
   updateProfile
 } from '@angular/fire/auth';
 import { Firestore, doc, setDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+
+// --- WRAPPER PARA TESTING ---
+// Agrupamos las funciones sueltas en un objeto exportado.
+// Esto permite que 'spyOn' funcione sobre este objeto en las pruebas.
+export const FireProxy = {
+  createUser: createUserWithEmailAndPassword,
+  signIn: signInWithEmailAndPassword,
+  signOut: signOut,
+  updateProfile: updateProfile,
+  authState: authState,
+  doc: doc,
+  setDoc: setDoc
+};
 
 @Injectable({
   providedIn: 'root'
@@ -23,18 +36,15 @@ export class AuthService {
 
   // 1. Registro
   async register(email: string, pass: string, username: string) {
-    
-    // 1. Crear usuario en Auth
-    const userCredential = await createUserWithEmailAndPassword(this.auth, email, pass);
+    // Usamos FireProxy en lugar de llamar a la función directamente
+    const userCredential = await FireProxy.createUser(this.auth, email, pass);
     const user = userCredential.user;
 
-    // 2. Actualizar el perfil de Auth (esto permite que user.displayName tenga valor)
-    await updateProfile(user, { displayName: username });
+    await FireProxy.updateProfile(user, { displayName: username });
 
-    // 3. Crear documento en la colección 'users' de Firestore
-    // Usamos el UID de Auth como ID del documento para que coincidan
-    const userDocRef = doc(this.firestore, `users/${user.uid}`);
-    await setDoc(userDocRef, {
+    // Usamos FireProxy para Firestore también
+    const userDocRef = FireProxy.doc(this.firestore, `users/${user.uid}`);
+    await FireProxy.setDoc(userDocRef, {
       uid: user.uid,
       email: email,
       username: username,
@@ -46,22 +56,22 @@ export class AuthService {
 
   // 2. Login
   login(email: string, pass: string) {
-    return signInWithEmailAndPassword(this.auth, email, pass);
+    return FireProxy.signIn(this.auth, email, pass);
   }
 
   // 3. Logout
   logout() {
-    return signOut(this.auth);
+    return FireProxy.signOut(this.auth);
   }
 
-  // 4. Obtener el usuario actual (útil para el Guard)
+  // 4. User Observable
   get user$(): Observable<any> {
-    return authState(this.auth);
+    return FireProxy.authState(this.auth);
   }
 
-  // 5. Verificar si está logueado (devuelve true/false)
+  // 5. Check Logged In
   get isLoggedIn(): Observable<boolean> {
-    return authState(this.auth).pipe(
+    return FireProxy.authState(this.auth).pipe(
       map(user => user !== null)
     );
   }
